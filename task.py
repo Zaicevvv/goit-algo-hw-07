@@ -76,7 +76,7 @@ class Record:
     def edit_phone(self, old, new):
         if self.phones:
             for i, phone in enumerate(self.phones):
-                if phone == old:
+                if phone.value == old:
                     self.phones[i] = Phone(new)
                     return
             raise ValueError("Phone number is not exist. ")
@@ -86,7 +86,7 @@ class Record:
     def find_phone(self, to_find):
         if self.phones:
             for phone in self.phones:
-                if phone == to_find:
+                if phone.value == to_find:
                     return to_find
             raise ValueError("Phone number is not exist. ")
         else:
@@ -95,7 +95,7 @@ class Record:
     def remove_phone(self, to_delete):
         if self.phones:
             for i, phone in enumerate(self.phones):
-                if phone == to_delete:
+                if phone.value == to_delete:
                     self.phones.pop(i)
                     return
             raise ValueError("Phone number is not exist. ")
