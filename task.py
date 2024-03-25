@@ -33,8 +33,12 @@ class AddressBook(UserDict):
                     "name": user.name.value, 
                     "congratulation_date": birthday_this_year.strftime('%d.%m.%Y')
                 })
-        for congratulation in upcoming_birthdays:
-            print(f'{congratulation['name']}: {congratulation['congratulation_date']}')
+
+        if upcoming_birthdays:
+            for congratulation in upcoming_birthdays:
+                print(f'{congratulation['name']}: {congratulation['congratulation_date']}')
+        else:
+            print('No upcoming birthdays found.')
 
 class Field:
     def __init__(self, value):
@@ -58,7 +62,7 @@ class Birthday(Field):
         try:
             super().__init__(datetime.strptime(value, '%d.%m.%Y'))
         except ValueError:
-            raise ValueError("Invalid date format. Use DD.MM.YYYY")
+            raise ValueError("Invalid date format. Use <DD.MM.YYYY>. ")
 
 class Record:
     def __init__(self, name):
@@ -75,9 +79,9 @@ class Record:
                 if str(phone) == str(old):
                     self.phones[i] = Phone(new)
                     return
-            raise ValueError("Phone number is not exist")
+            raise ValueError("Phone number is not exist. ")
         else:
-            raise ValueError("Phone number is not exist")
+            raise ValueError("Phone number is not exist. ")
 
     def find_phone(self, to_find):
         if self.phones:
@@ -93,30 +97,33 @@ class Record:
 
     def add_birthday(self, birthday):
         if self.birthday:
-            raise Exception('Birthday is already set')
+            raise ValueError('Birthday is already set. ')
         self.birthday = Birthday(birthday)
 
     def __str__(self):
         return f"Contact name: {self.name.value}, "\
                f"phones: {'; '.join(str(p.value) for p in self.phones)}, "\
-               f"birthday: {self.birthday.value.strftime('%d/%m/%Y') if self.birthday else ''}"
+               f"birthday: {self.birthday.value.strftime('%d.%m.%Y') if self.birthday else ''}"
 
 def input_error(func):
-    msg = "ValueError: Use format: <command> <name> <phone number: 10 digits>. "
+    msg = "Use format: <command> <name> <value>[ <other value>]. "
     def inner(*args):
         try:
             return func(*args)
         except ValueError as e:
-            if str(e) == 'Phone number must be 10 digits. ':
+            if str(e) == 'Phone number must be 10 digits. ' or \
+               str(e) == "Invalid date format. Use <DD.MM.YYYY>. " or \
+               str(e) == "Phone number is not exist. " or \
+               str(e) == 'Birthday is already set. ':
                 nonlocal msg
                 msg = str(e)
             return msg + \
                    "Enter 'list' to see all commands and their format."
         except KeyError:
-            return f"KeyError: Contact '{args[0][0]}' doesn't exists. To add it use command 'add'. "\
-                   "Enter 'list' to see all commands and their format."
+            return f"Contact '{args[0][0]}' doesn't exists. To add it "\
+                    "use command 'add'. Enter 'list' to see all commands and their format."
         except IndexError:
-            return "IndexError: Not enough arguments. "\
+            return "Not enough arguments. "\
                    "Enter 'list' to see all commands and their format."
 
     return inner
@@ -189,10 +196,10 @@ def show_all(book):
 
 def show_all_comands():
     print('hello - Say Hello')
-    print('add - add contact, format: add <name> <phone number: 10 digits>')
+    print('add - add contact, add phone, format: add <name> <phone number: 10 digits>')
     print('change - change contact, format: change <name> <old phone number: 10 digits> <new phone number: 10 digits>')
     print('phone - show contacts phone number(s), format: phone <name>')
-    print('all - show all contacts with phone numbers, format: all')
+    print('all - show all contacts with details, format: all')
     print('add-birthday - add birthday to contact, format: add-birthday <name> <DD.MM.YYYY>')
     print('show-birthday - show contacts birthday, format: show-birthday <name>')
     print('birthdays - show upcoming birthdays, format: birthdays')
